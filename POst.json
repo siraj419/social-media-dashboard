@@ -1,0 +1,21 @@
+{
+    "id": "hwu92",
+    "title": "Title of the POst",
+    "body": "Body of the POst",
+    "userId": 1,
+    "tags": ["tag1", "tag2", "tag3"],
+    "likes": 100,
+    "dislikes": 10,
+    "comments": [
+        {
+            "userId": 2,
+            "comment": "Great post!",
+            "likes": 5
+        },
+        {
+            "userId": 3,
+            "comment": "Thanks for sharing.",
+            "likes": 3
+        }
+    ]
+}
