@@ -39,7 +39,7 @@ const CreatePostModal = ({closeCreateModal}) => {
                         required
                     ></textarea>
                 </div>
-                {/* Tags */}
+         
                 <div>
                     <label
                         htmlFor="tags"

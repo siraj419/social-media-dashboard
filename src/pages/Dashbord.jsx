@@ -1,35 +1,38 @@
-import React, { useState } from 'react'
-import PostCard from '../components/PostCard'
-import CreatePostModal from '../components/CreatePostModal';
+import React, { useEffect, useState } from "react";
+import PostCard from "../components/PostCard";
+import CreatePostModal from "../components/CreatePostModal";
+import EditPostModal from "../components/EditPostModal";
+import { useNavigate } from "react-router";
 
-const posts = [
-  {
-    id: "p1",
-    title: "Understanding JavaScript Closures",
-    body: "Closures are one of the most powerful features in JavaScript. They allow inner functions to access outer function variables even after the outer function has returned.",
-    userId: 1,
-    tags: ["javascript", "functions", "closures"],
-    likes: 120,
-    dislikes: 8,
-    comments: [
-      { userId: 2, comment: "Very well explained!", likes: 10 },
-      { userId: 3, comment: "Finally understood closures.", likes: 7 }
-    ]
-  },
-  {
-    id: "p2",
-    title: "CSS Grid vs Flexbox",
-    body: "Both Grid and Flexbox are layout systems in CSS, but they serve different purposes. Grid is two-dimensional while Flexbox is one-dimensional.",
-    userId: 2,
-    tags: ["css", "frontend", "layout"],
-    likes: 98,
-    dislikes: 5,
-    comments: [
-      { userId: 1, comment: "Nice comparison!", likes: 4 },
-      { userId: 4, comment: "Grid is my favorite.", likes: 2 }
-    ]
-  },
-  {
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([
+    {
+      id: "p1",
+      title: "Understanding JavaScript Closures",
+      body: "Closures are one of the most powerful features in JavaScript. They allow inner functions to access outer function variables even after the outer function has returned.",
+      userId: 1,
+      tags: ["javascript", "functions", "closures"],
+      likes: 120,
+      dislikes: 8,
+      comments: [
+        { userId: 2, comment: "Very well explained!", likes: 10 },
+        { userId: 3, comment: "Finally understood closures.", likes: 7 },
+      ],
+    },
+    {
+      id: "p2",
+      title: "CSS Grid vs Flexbox",
+      body: "Both Grid and Flexbox are layout systems in CSS, but they serve different purposes. Grid is two-dimensional while Flexbox is one-dimensional.",
+      userId: 2,
+      tags: ["css", "frontend", "layout"],
+      likes: 98,
+      dislikes: 5,
+      comments: [
+        { userId: 1, comment: "Nice comparison!", likes: 4 },
+        { userId: 4, comment: "Grid is my favorite.", likes: 2 },
+      ],
+       
     id: "p3",
     title: "Building REST APIs with FastAPI",
     body: "FastAPI is a modern web framework for building APIs with Python. It’s fast, easy to use, and fully supports async programming.",
@@ -132,63 +135,108 @@ const posts = [
       { userId: 1, comment: "Git saved my life.", likes: 9 },
       { userId: 7, comment: "Everyone should learn Git.", likes: 5 }
     ]
+    },
+  ]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+const [searchTerm, setSearchTerm] = useState("");
+
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const openCreateModal = () => setCreateModalOpen(true);
+  const closeCreateModal = () => setCreateModalOpen(false);
+
+  const handleEdit = (id, updatedPost) => {
+    setPosts(posts.map((p) => (p.id === id ? { ...p, ...updatedPost } : p)));
+    setIsEditOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    setPosts(posts.filter((p) => p.id !== id));
+  };
+  
+  useEffect(()=>{
+    if(searchTerm){
+      setFilteredPosts(posts.filter((post) =>
+        post.title.toLowerCase().includes(searchTerm.toLowerCase())  ||
+        post.body.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
+    }else{
+      setFilteredPosts(posts);
+    }
+  }, [searchTerm]);
+
+  const onLike = (id) => {
+    console.log(id)
+    setFilteredPosts(filteredPosts.map((post)=>{
+      if(post.id == id){
+        post.likes++;
+      }
+      return post
+    }));
   }
-];
 
-
-const Dashbord = () => {
-
-    const [createModalOpen, setCreateModalOpen] = useState(false);
-
-    const openCreateModal = () => {
-        setCreateModalOpen(true);
-    }
-
-    const closeCreateModal = () => {
-        setCreateModalOpen(false);
-    }
-
+  const onDislike = (id) => {
+    console.log(id)
+    setFilteredPosts(filteredPosts.map((post)=>{
+      if(post.id == id){
+        post.dislikes++;
+      }
+      return post
+    }));
+  }
 
   return (
-    <div>
-        {/* Header */}
-        <header
-            className='bg-gray-200 flex p-4 justify-between items-center border-b-2 border-gray-900'
-        >
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <input
-                type='text'
-                placeholder="Search..."
-                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
-        </header>
-        <div className='flex justify-end p-5'>
-            <button 
-                className='px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded-md'
-                onClick={openCreateModal}
-            >
-                + Add Post
-            </button>
-        </div>
-        <div
-            className='flex flex-wrap justify-center gap-5 mt-5'
-        >
-            {
-                posts.map((post) => (
-                    <PostCard key={post.id} post={post} />
-                ))
-            }
-            
-        </div>
-        {
-            createModalOpen && (
-                <CreatePostModal
-                    closeCreateModal={closeCreateModal}
-                />
-            )
-        }
-    </div>
-  )
-}
+    <div className="min-h-screen bg-gradient-to-br from-orange-100 via-pink-100 to-yellow-100 text-gray-900">
+      <header className="backdrop-blur-md bg-white/40 border border-white/30 shadow-lg p-4 flex justify-between items-center rounded-xl">
+        <h1 className=" text-3xl font-bold text-gray-800 tracking-wide">Dashboard</h1>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+        />
+      </header>
 
-export default Dashbord
+      <div className="flex justify-end p-5">
+        <button
+          className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 hover:shadow-md transition-all duration-200"
+          onClick={openCreateModal}
+        >
+          + Add Post
+        </button>
+      </div>
+   
+      <div className="flex flex-wrap justify-center gap-5 mt-5">
+        {filteredPosts.map((post) => (
+          <PostCard
+            key={post.id}
+            onClick={()=> navigate(`/post/${post.id}`)}
+            post={post}
+            onDelete={() => handleDelete(post.id)}
+            onEditClick={() => {
+              setEditingPost(post);
+              setIsEditOpen(true);
+            }}
+            onDislike={onDislike}
+            onLike={onLike}
+          />
+        ))}
+      </div>
+
+      {createModalOpen && <CreatePostModal closeCreateModal={closeCreateModal} />}
+
+      {isEditOpen && (
+        <EditPostModal
+          closeEditModal={() => setIsEditOpen(false)}
+          post={editingPost}
+          onSave={handleEdit}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;
